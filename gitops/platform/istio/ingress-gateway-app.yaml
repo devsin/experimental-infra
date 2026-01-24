@@ -4,13 +4,13 @@ metadata:
   name: istio-ingressgateway
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-wave: "-5"
 spec:
   project: default
   source:
     repoURL: https://istio-release.storage.googleapis.com/charts
     chart: gateway
-    targetRevision: 1.24.1
+    targetRevision: 1.27.5
   destination:
     server: https://kubernetes.default.svc
     namespace: istio-ingress
