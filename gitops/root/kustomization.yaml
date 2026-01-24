@@ -1,6 +1,7 @@
 resources:
 - ../platform/namespaces
 - ../platform/addons
-- ../platform/istio
+
+# - ../platform/istio
 
 # - ../apps
