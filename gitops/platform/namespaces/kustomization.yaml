@@ -1,3 +1,4 @@
 resources:
 - payments.yaml
 - db.yaml
+- apps.yaml

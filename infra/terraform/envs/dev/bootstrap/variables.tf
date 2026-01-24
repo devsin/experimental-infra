@@ -38,6 +38,12 @@ variable "cluster_name" {
   default = "gitops-demo"
 }
 
+variable "deletion_protection" {
+  description = "Whether to enable deletion protection on the GKE cluster. Set to false to allow terraform destroy."
+  type        = bool
+  default     = true
+}
+
 variable "network_name" {
   type    = string
   default = "demo-network"
@@ -61,10 +67,6 @@ variable "services_cidr" {
 variable "artifact_repository_id" {
   type    = string
   default = "demo-images"
-}
-
-variable "git_repo_url" {
-  type = string
 }
 
 variable "node_pools" {

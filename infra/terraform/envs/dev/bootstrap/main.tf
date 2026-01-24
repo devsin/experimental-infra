@@ -31,7 +31,7 @@ provider "google" {
 }
 
 module "project" {
-  source          = "../../modules/project"
+  source          = "../../../modules/project"
   project_id      = local.project_id_unique
   name            = local.project_name_unique
   billing_account = var.billing_account
@@ -41,14 +41,14 @@ module "project" {
 }
 
 module "apis" {
-  source     = "../../modules/apis"
+  source     = "../../../modules/apis"
   project_id = module.project.project_id
 
   depends_on = [module.project]
 }
 
 module "network" {
-  source          = "../../modules/network"
+  source          = "../../../modules/network"
   project_id      = module.project.project_id
   region          = var.region
   network_name    = local.network_name_unique
@@ -60,7 +60,7 @@ module "network" {
 }
 
 module "gke" {
-  source                 = "../../modules/gke"
+  source                 = "../../../modules/gke"
   project_id             = module.project.project_id
   region                 = var.region
   cluster_name           = local.cluster_name_unique
@@ -69,12 +69,13 @@ module "gke" {
   ip_range_pods_name     = module.network.pods_range_name
   ip_range_services_name = module.network.services_range_name
   node_pools             = var.node_pools
+  deletion_protection    = var.deletion_protection
 
   depends_on = [module.apis]
 }
 
 module "artifact_registry" {
-  source        = "../../modules/artifact_registry"
+  source        = "../../../modules/artifact_registry"
   project_id    = module.project.project_id
   region        = var.region
   repository_id = local.artifact_repo_unique

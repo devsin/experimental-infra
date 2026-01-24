@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: transfers-client-policy
+  namespace: apps
+spec:
+  hosts:
+  - transfers.apps.svc.cluster.local
+  http:
+  - timeout: 2s
+    retries:
+      attempts: 2
+      perTryTimeout: 1s
+      retryOn: gateway-error,connect-failure,refused-stream
+    route:
+    - destination:
+        host: transfers.apps.svc.cluster.local
+        port:
+          number: 8080

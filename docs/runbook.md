@@ -6,13 +6,20 @@
 - Terraform installed (>=1.6)
 - ArgoCD CLI (optional for troubleshooting)
 
+
+## Access / Day 0 commands
+- Login to GCP: `gcloud auth login`
+- Configure kube context: `gcloud container clusters get-credentials cyberark-gke-dev-bd686e --zone europe-west2 --project cyberark-gitops-bd686e`
+- Get ArgoCD server IP: `kubectl get svc -n argocd argocd-server -o jsonpath='{.status.loadBalancer.ingress[0].ip}'`
+- Access the UI at `https://<IP_ADDRESS>` with username `admin` and password from: `kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo`
+
 ## Bootstrapping / Day 1
-1) Configure Terraform variables in `infra/terraform/envs/dev/terraform.tfvars`.
-2) Run `terraform init` (first time) in `infra/terraform/envs/dev`.
-3) Run `terraform apply` in `infra/terraform/envs/dev`.
-	 - Provisions GCP project resources, networking, GKE cluster, artifact registry.
-	 - Installs ArgoCD via Helm in namespace `argocd`.
-	 - Creates ArgoCD root Application pointing to `gitops/root`.
+1) Configure Terraform variables:
+	- Infra stack: `infra/terraform/envs/dev/bootstrap/terraform.tfvars` (project, network, GKE, artifact registry).
+	- Platform stack: `infra/terraform/envs/dev/platform/terraform.tfvars` (Git repo URL, region if needed).
+2) Bootstrap apply: `terraform -chdir=infra/terraform/envs/dev/bootstrap init` then `terraform -chdir=infra/terraform/envs/dev/bootstrap apply`.
+3) Platform apply: `terraform -chdir=infra/terraform/envs/dev/platform init` then `terraform -chdir=infra/terraform/envs/dev/platform apply`.
+	- Installs ArgoCD via Helm in namespace `argocd` and renders the root Application pointing to `gitops/root`.
 4) Wait for ArgoCD to sync; namespaces and add-on Applications will appear.
 
 ## GitOps Sync Model

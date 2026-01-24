@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: api-gateway-route
+  namespace: apps
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - public-gw
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: api-gateway.apps.svc.cluster.local
+        port:
+          number: 8080

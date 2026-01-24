@@ -38,6 +38,11 @@ variable "node_pools" {
   }))
 }
 
+variable "deletion_protection" {
+  type    = bool
+  default = true
+}
+
 module "gke" {
   source  = "terraform-google-modules/kubernetes-engine/google"
   version = "43.0.0"
@@ -56,6 +61,8 @@ module "gke" {
   initial_node_count       = 1
 
   node_pools = var.node_pools
+
+  deletion_protection = var.deletion_protection
 }
 
 output "name" {

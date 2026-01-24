@@ -1,0 +1,14 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: api-gateway-ingress-only
+  namespace: apps
+spec:
+  selector:
+    matchLabels:
+      app: api-gateway
+  rules:
+  - from:
+    - source:
+        principals:
+        - "cluster.local/ns/istio-ingress/sa/istio-ingressgateway-service-account"

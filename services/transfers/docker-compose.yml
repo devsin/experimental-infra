@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: transfers
+      POSTGRES_USER: transfers
+      POSTGRES_PASSWORD: transfers
+    ports:
+      - "5433:5432"
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+  transfers:
+    build: .
+    environment:
+      ENV: dev
+      LOG_LEVEL: debug
+      HTTP_ADDR: :8081
+      DATABASE_URL: postgres://transfers:transfers@db:5432/transfers?sslmode=disable
+      REDIS_ADDR: redis:6379
+      ACCOUNTS_URL: http://accounts:8080
+    depends_on:
+      - db
+      - redis
+    ports:
+      - "8081:8081"
