@@ -4,4 +4,3 @@ resources:
 - istio-base-app.yaml
 - istiod-app.yaml
 - ingress-gateway-app.yaml
-- peerauth-apps.yaml
