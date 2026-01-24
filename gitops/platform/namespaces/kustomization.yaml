@@ -2,3 +2,5 @@ resources:
 - payments.yaml
 - db.yaml
 - apps.yaml
+commonAnnotations:
+	argocd.argoproj.io/sync-wave: "-1"

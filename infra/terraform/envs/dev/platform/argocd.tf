@@ -24,28 +24,6 @@ resource "helm_release" "argocd" {
         type = "LoadBalancer"
       }
     }
-    applications = [
-      {
-        name      = "root"
-        namespace = "argocd"
-        project   = "default"
-        source = {
-          repoURL        = var.git_repo_url
-          targetRevision = "main"
-          path           = "gitops/root"
-        }
-        destination = {
-          server    = "https://kubernetes.default.svc"
-          namespace = "argocd"
-        }
-        syncPolicy = {
-          automated = {
-            prune    = true
-            selfHeal = true
-          }
-        }
-      }
-    ]
   })]
 
   depends_on = [kubernetes_namespace_v1.argocd]
