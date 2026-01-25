@@ -61,7 +61,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		case errors.Is(err, ErrAccountNotFound):
 			httpx.Error(w, http.StatusBadRequest, "account_missing", err.Error())
 		default:
-			h.log.Error("create transfer failed", zap.Error(err))
+			httpx.Logger(r.Context(), h.log).Error("create transfer failed", zap.Error(err))
 			httpx.Error(w, http.StatusInternalServerError, "db_error", "failed to create transfer")
 		}
 		return
@@ -83,7 +83,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
 			httpx.Error(w, http.StatusNotFound, "not_found", "transfer not found")
 			return
 		}
-		h.log.Error("get transfer failed", zap.Error(err))
+		httpx.Logger(r.Context(), h.log).Error("get transfer failed", zap.Error(err))
 		httpx.Error(w, http.StatusInternalServerError, "db_error", "failed to fetch transfer")
 		return
 	}
@@ -107,7 +107,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 
 	transfers, err := h.svc.List(r.Context(), accountID, limit)
 	if err != nil {
-		h.log.Error("list transfers failed", zap.Error(err))
+		httpx.Logger(r.Context(), h.log).Error("list transfers failed", zap.Error(err))
 		httpx.Error(w, http.StatusInternalServerError, "db_error", "failed to list transfers")
 		return
 	}

@@ -22,5 +22,5 @@ func NewRouter(log *zap.Logger, svc *transfer.Service) http.Handler {
 		r.Get("/{id}", h.Get)
 	})
 
-	return httpx.WithRequestID(httpx.Recover(log)(httpx.AccessLog(log)(r)))
+	return httpx.WithRequestID(httpx.WithLogger(log)(httpx.Recover(log)(httpx.AccessLog(log)(r))))
 }

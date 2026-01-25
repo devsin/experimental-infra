@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	httpx "github.com/devsin/experimental-infra/services/common/httpx"
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
@@ -43,6 +44,8 @@ func NewService(log *zap.Logger, repo Repository, redisClient *redis.Client, acc
 
 // Create records a transfer after validating accounts and idempotency.
 func (s *Service) Create(ctx context.Context, fromID, toID uuid.UUID, amountCents int64, idempotencyKey string) (*Transfer, error) {
+	log := httpx.Logger(ctx, s.log)
+
 	if amountCents <= 0 {
 		return nil, fmt.Errorf("%w: amount must be > 0", ErrValidation)
 	}
@@ -83,7 +86,7 @@ func (s *Service) Create(ctx context.Context, fromID, toID uuid.UUID, amountCent
 	}
 
 	if err := s.repo.Create(ctx, t); err != nil {
-		s.log.Error("create transfer failed", zap.Error(err))
+		log.Error("create transfer failed", zap.Error(err))
 		if idempotencyKey != "" {
 			_ = s.redis.Del(ctx, s.idempotencyKey(idempotencyKey)).Err()
 		}
@@ -100,7 +103,7 @@ func (s *Service) Get(ctx context.Context, id uuid.UUID) (*Transfer, error) {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, err
 		}
-		s.log.Error("get transfer failed", zap.Error(err))
+		httpx.Logger(ctx, s.log).Error("get transfer failed", zap.Error(err))
 	}
 	return t, err
 }
@@ -116,7 +119,7 @@ func (s *Service) List(ctx context.Context, accountID *uuid.UUID, limit int) ([]
 
 	transfers, err := s.repo.List(ctx, accountID, limit)
 	if err != nil {
-		s.log.Error("list transfers failed", zap.Error(err))
+		httpx.Logger(ctx, s.log).Error("list transfers failed", zap.Error(err))
 		return nil, err
 	}
 	return transfers, nil
@@ -148,6 +151,10 @@ func (s *Service) ensureAccountExists(ctx context.Context, id uuid.UUID) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return err
+	}
+
+	if reqID := httpx.RequestID(ctx); reqID != "" {
+		req.Header.Set("X-Request-ID", reqID)
 	}
 
 	resp, err := s.httpClient.Do(req)

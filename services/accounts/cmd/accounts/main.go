@@ -14,31 +14,31 @@ import (
 )
 
 func main() {
-    cfg, err := config.Load()
-    if err != nil {
-        log.Fatalf("config error: %v", err)
-    }
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatalf("config error: %v", err)
+	}
 
-    logr, err := logger.New(cfg.Env, cfg.LogLevel)
-    if err != nil {
-        log.Fatalf("logger init error: %v", err)
-    }
-    defer logr.Sync() //nolint:errcheck
+	logr, err := logger.New(cfg.ServiceName, cfg.Env, cfg.LogLevel)
+	if err != nil {
+		log.Fatalf("logger init error: %v", err)
+	}
+	defer logr.Sync() //nolint:errcheck
 
-    dbConn, err := db.OpenGorm(cfg.DatabaseURL)
-    if err != nil {
-        logr.Fatal("failed to connect database", zap.Error(err))
-    }
+	dbConn, err := db.OpenGorm(cfg.DatabaseURL)
+	if err != nil {
+		logr.Fatal("failed to connect database", zap.Error(err))
+	}
 
-    repo := account.NewRepository(dbConn)
-    if err := repo.Migrate(context.Background()); err != nil {
-        logr.Fatal("migration failed", zap.Error(err))
-    }
+	repo := account.NewRepository(dbConn)
+	if err := repo.Migrate(context.Background()); err != nil {
+		logr.Fatal("migration failed", zap.Error(err))
+	}
 
-    svc := account.NewService(logr, repo)
-    handler := app.NewRouter(logr, svc)
+	svc := account.NewService(logr, repo)
+	handler := app.NewRouter(logr, svc)
 
-    if err := httpx.Run(context.Background(), cfg.HTTPAddr, handler, logr); err != nil {
-        logr.Fatal("server error", zap.Error(err))
-    }
+	if err := httpx.Run(context.Background(), cfg.HTTPAddr, handler, logr); err != nil {
+		logr.Fatal("server error", zap.Error(err))
+	}
 }

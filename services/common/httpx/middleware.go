@@ -14,6 +14,7 @@ import (
 type ctxKey string
 
 const requestIDKey ctxKey = "request_id"
+const loggerKey ctxKey = "logger"
 
 // WithRequestID attaches a request ID to the context and response.
 func WithRequestID(next http.Handler) http.Handler {
@@ -28,6 +29,43 @@ func WithRequestID(next http.Handler) http.Handler {
 	})
 }
 
+// WithLogger injects a logger enriched with request ID into the context.
+func WithLogger(base *zap.Logger) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			reqID := RequestID(r.Context())
+			log := base
+			if reqID != "" {
+				log = log.With(zap.String("request_id", reqID))
+			}
+			ctx := context.WithValue(r.Context(), loggerKey, log)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
+}
+
+// Logger returns the request-scoped logger if present, otherwise the provided base.
+func Logger(ctx context.Context, base *zap.Logger) *zap.Logger {
+	if ctx == nil {
+		return base
+	}
+	if l, ok := ctx.Value(loggerKey).(*zap.Logger); ok && l != nil {
+		return l
+	}
+	return base
+}
+
+// RequestID returns the request id stored on the context.
+func RequestID(ctx context.Context) string {
+	if ctx == nil {
+		return ""
+	}
+	if v, ok := ctx.Value(requestIDKey).(string); ok {
+		return v
+	}
+	return ""
+}
+
 // AccessLog logs request/response details.
 func AccessLog(log *zap.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
@@ -37,14 +75,12 @@ func AccessLog(log *zap.Logger) func(http.Handler) http.Handler {
 			next.ServeHTTP(recorder, r)
 			duration := time.Since(start)
 
-			reqID, _ := r.Context().Value(requestIDKey).(string)
-			log.Info("request",
+			Logger(r.Context(), log).Info("request",
 				zap.String("method", r.Method),
 				zap.String("path", r.URL.Path),
 				zap.Int("status", recorder.status),
 				zap.Int64("bytes", recorder.size),
 				zap.Duration("duration", duration),
-				zap.String("request_id", reqID),
 			)
 		})
 	}
@@ -56,7 +92,7 @@ func Recover(log *zap.Logger) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			defer func() {
 				if rec := recover(); rec != nil {
-					log.Error("panic recovered", zap.Any("error", rec), zap.ByteString("stack", debug.Stack()))
+					Logger(r.Context(), log).Error("panic recovered", zap.Any("error", rec), zap.ByteString("stack", debug.Stack()))
 					Error(w, http.StatusInternalServerError, "internal_error", "internal server error")
 				}
 			}()

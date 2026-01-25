@@ -20,7 +20,7 @@ func main() {
 		log.Fatalf("config error: %v", err)
 	}
 
-	logr, err := logger.New(cfg.Env, cfg.LogLevel)
+	logr, err := logger.New(cfg.ServiceName, cfg.Env, cfg.LogLevel)
 	if err != nil {
 		log.Fatalf("logger init error: %v", err)
 	}

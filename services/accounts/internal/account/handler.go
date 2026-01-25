@@ -45,7 +45,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 			httpx.Error(w, http.StatusBadRequest, "validation_error", err.Error())
 			return
 		}
-		h.log.Error("create account failed", zap.Error(err))
+		httpx.Logger(r.Context(), h.log).Error("create account failed", zap.Error(err))
 		httpx.Error(w, http.StatusInternalServerError, "db_error", "failed to create account")
 		return
 	}
@@ -66,7 +66,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
 			httpx.Error(w, http.StatusNotFound, "not_found", "account not found")
 			return
 		}
-		h.log.Error("get account failed", zap.Error(err))
+		httpx.Logger(r.Context(), h.log).Error("get account failed", zap.Error(err))
 		httpx.Error(w, http.StatusInternalServerError, "db_error", "failed to fetch account")
 		return
 	}
@@ -99,7 +99,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 			httpx.Error(w, http.StatusBadRequest, "validation_error", err.Error())
 			return
 		}
-		h.log.Error("update account failed", zap.Error(err))
+		httpx.Logger(r.Context(), h.log).Error("update account failed", zap.Error(err))
 		httpx.Error(w, http.StatusInternalServerError, "db_error", "failed to update account")
 		return
 	}
@@ -119,7 +119,7 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 			httpx.Error(w, http.StatusNotFound, "not_found", "account not found")
 			return
 		}
-		h.log.Error("delete account failed", zap.Error(err))
+		httpx.Logger(r.Context(), h.log).Error("delete account failed", zap.Error(err))
 		httpx.Error(w, http.StatusInternalServerError, "db_error", "failed to delete account")
 		return
 	}
@@ -138,7 +138,7 @@ func parseID(w http.ResponseWriter, r *http.Request) (uuid.UUID, bool) {
 }
 
 func decodeJSON(r *http.Request, v any) error {
-	defer r.Body.Close()
+	defer r.Body.Close() //nolint:errcheck
 	dec := json.NewDecoder(r.Body)
 	dec.DisallowUnknownFields()
 	return dec.Decode(v)

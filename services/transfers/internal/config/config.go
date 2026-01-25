@@ -4,6 +4,7 @@ import "github.com/devsin/experimental-infra/services/common/config"
 
 // Config holds runtime configuration for the transfers service.
 type Config struct {
+	ServiceName    string `env:"SERVICE_NAME" env-default:"transfers"`
 	Env            string `env:"ENV" env-default:"dev"`
 	LogLevel       string `env:"LOG_LEVEL" env-default:"debug"`
 	HTTPAddr       string `env:"HTTP_ADDR" env-default:":8081"`

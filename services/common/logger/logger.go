@@ -10,8 +10,8 @@ import (
 
 var global *zap.Logger
 
-// New constructs a zap logger based on environment and level.
-func New(env, level string) (*zap.Logger, error) {
+// New constructs a zap logger based on environment and level, and decorates logs with service/env fields.
+func New(service, env, level string) (*zap.Logger, error) {
 	var cfg zap.Config
 	if strings.EqualFold(env, "prod") {
 		cfg = zap.NewProductionConfig()
@@ -29,6 +29,15 @@ func New(env, level string) (*zap.Logger, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	if service == "" {
+		service = "unknown"
+	}
+
+	l = l.With(
+		zap.String("service", service),
+		zap.String("env", env),
+	)
 
 	global = l
 	return l, nil
