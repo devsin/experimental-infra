@@ -29,3 +29,4 @@ docker-compose up --build
 - `PATCH /accounts/{id}` `{name}` → 200
 - `DELETE /accounts/{id}` → 200
 - `GET /health` → 200
+
