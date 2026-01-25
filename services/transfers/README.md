@@ -47,3 +47,4 @@ The compose file starts Postgres, Redis, and the transfers service. Set `ACCOUNT
 - `REDIS_ADDR` (default `redis-master.db.svc.cluster.local:6379`)
 - `REDIS_PASSWORD` (optional)
 - `ACCOUNTS_URL` (default `http://accounts.apps.svc.cluster.local:8080`)
+
