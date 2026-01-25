@@ -4,3 +4,5 @@ resources:
 - istio-base-app.yaml
 - istiod-app.yaml
 - ingress-gateway-app.yaml
+commonAnnotations:
+  argocd.argoproj.io/sync-wave: "-5"
