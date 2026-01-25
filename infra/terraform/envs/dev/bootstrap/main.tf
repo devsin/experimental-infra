@@ -82,3 +82,10 @@ module "artifact_registry" {
 
   depends_on = [module.apis]
 }
+
+# Allow GKE node service account to pull images from Artifact Registry.
+resource "google_project_iam_member" "gke_nodes_artifact_registry_reader" {
+  project = module.project.project_id
+  role    = "roles/artifactregistry.reader"
+  member  = "serviceAccount:${module.gke.service_account}"
+}
