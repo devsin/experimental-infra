@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: apps
+resources:
+- deployment.yaml
+- service.yaml
+images:
+- name: accounts
+  newName: europe-west2-docker.pkg.dev/cyberark-gitops-c322b4/cyberark-images-c322b4/accounts
+  newTag: latest

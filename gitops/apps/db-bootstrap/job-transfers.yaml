@@ -1,0 +1,55 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: bootstrap-transfers-db
+  namespace: db
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: init-transfers
+        image: postgres:16-alpine
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-postgresql
+              key: postgres-password
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: transfers-db
+              key: DB_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: transfers-db
+              key: DB_PASSWORD
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: transfers-db
+              key: DB_NAME
+        command:
+        - sh
+        - -c
+        - |
+          set -euo pipefail
+          HOST=postgres-postgresql.db
+          USER="$DB_USER"
+          PASS="$DB_PASSWORD"
+          DB="$DB_NAME"
+
+          psql -h "$HOST" -U postgres -tc "SELECT 1 FROM pg_roles WHERE rolname='${USER}'" | grep -q 1 || \
+            psql -h "$HOST" -U postgres -c "CREATE USER ${USER} WITH PASSWORD '${PASS}'"
+
+          psql -h "$HOST" -U postgres -tc "SELECT 1 FROM pg_database WHERE datname='${DB}'" | grep -q 1 || \
+            psql -h "$HOST" -U postgres -c "CREATE DATABASE ${DB} OWNER ${USER}"
+
+          psql -h "$HOST" -U postgres -d "$DB" -c "GRANT ALL PRIVILEGES ON DATABASE ${DB} TO ${USER}"
+
+          echo "transfers database ready"

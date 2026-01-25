@@ -4,3 +4,6 @@ commonAnnotations:
   argocd.argoproj.io/sync-wave: "5"
 resources:
 - api-gateway
+- db-bootstrap
+- accounts
+- transfers

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: db-bootstrap
+  namespace: db
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
