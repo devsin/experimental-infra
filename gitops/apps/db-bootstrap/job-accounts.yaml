@@ -44,8 +44,11 @@ spec:
           PASS="$DB_PASSWORD"
           DB="$DB_NAME"
 
-          psql -h "$HOST" -U postgres -tc "SELECT 1 FROM pg_roles WHERE rolname='${USER}'" | grep -q 1 || \
+          if psql -h "$HOST" -U postgres -tc "SELECT 1 FROM pg_roles WHERE rolname='${USER}'" | grep -q 1; then
+            psql -h "$HOST" -U postgres -c "ALTER USER ${USER} WITH PASSWORD '${PASS}'"
+          else
             psql -h "$HOST" -U postgres -c "CREATE USER ${USER} WITH PASSWORD '${PASS}'"
+          fi
 
           psql -h "$HOST" -U postgres -tc "SELECT 1 FROM pg_database WHERE datname='${DB}'" | grep -q 1 || \
             psql -h "$HOST" -U postgres -c "CREATE DATABASE ${DB} OWNER ${USER}"
