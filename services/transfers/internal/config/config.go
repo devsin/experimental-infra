@@ -7,7 +7,7 @@ type Config struct {
 	ServiceName    string `env:"SERVICE_NAME" env-default:"transfers"`
 	Env            string `env:"ENV" env-default:"dev"`
 	LogLevel       string `env:"LOG_LEVEL" env-default:"debug"`
-	HTTPAddr       string `env:"HTTP_ADDR" env-default:":8081"`
+	HTTPAddr       string `env:"HTTP_ADDR" env-default:":8080"`
 	DatabaseURL    string `env:"DATABASE_URL" env-required:"true"`
 	RedisAddr      string `env:"REDIS_ADDR" env-default:"redis-master.db.svc.cluster.local:6379"`
 	RedisPassword  string `env:"REDIS_PASSWORD" env-default:""`

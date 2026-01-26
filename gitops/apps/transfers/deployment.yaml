@@ -19,7 +19,7 @@ spec:
       - name: transfers
         image: transfers
         ports:
-        - containerPort: 8081
+        - containerPort: 8080
           name: http
         env:
         - name: ENV
@@ -27,7 +27,7 @@ spec:
         - name: LOG_LEVEL
           value: info
         - name: HTTP_ADDR
-          value: ":8081"
+          value: ":8080"
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:
