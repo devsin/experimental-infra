@@ -3,4 +3,5 @@ resources:
 - ../platform/addons
 - ../platform/istio
 - ../platform/istio-config
+- ../platform/observability
 - ../apps

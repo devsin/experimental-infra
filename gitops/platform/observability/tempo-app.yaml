@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tempo
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://grafana.github.io/helm-charts
+    chart: tempo
+    targetRevision: 12.3.1
+    helm:
+      releaseName: tempo
+      values: |
+        tempo:
+          storage:
+            trace:
+              backend: memory
+        server:
+          http_listen_port: 3200
+        distributor:
+          config:
+            log_received_traces: false
+        querier:
+          frontend_worker:
+            frontend_address: tempo-query-frontend:9095
+  destination:
+    namespace: observability
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
