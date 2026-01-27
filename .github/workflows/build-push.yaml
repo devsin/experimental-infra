@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  GCP_REGISTRY: "europe-west2-docker.pkg.dev/cyberark-gitops-c322b4/cyberark-images-c322b4"
+  GCP_REGISTRY: "europe-west2-docker.pkg.dev/cyberark-gitops-3a49df/cyberark-images-3a49df"
 
 jobs:
   changes:
