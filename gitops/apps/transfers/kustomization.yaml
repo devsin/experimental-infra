@@ -6,5 +6,5 @@ resources:
 - service.yaml
 images:
 - name: transfers
-  newName: europe-west2-docker.pkg.dev/cyberark-gitops-c322b4/cyberark-images-c322b4/transfers
+  newName: europe-west2-docker.pkg.dev/cyberark-gitops-3a49df/cyberark-images-3a49df/transfers
   newTag: latest
